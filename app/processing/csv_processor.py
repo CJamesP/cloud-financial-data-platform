@@ -10,6 +10,7 @@ from app.models.transaction import Transaction
 def process_csv(file_path: Path):
     valid_transactions = []
     invalid_transactions = []
+    seen_transaction_ids = set()
 
     with file_path.open(mode="r", newline="", encoding="utf-8") as csv_file:
         reader = csv.DictReader(csv_file)
@@ -17,20 +18,38 @@ def process_csv(file_path: Path):
         for row_number, row in enumerate(reader, start=2):
             try:
                 transaction = Transaction(**row)
+
+                if transaction.transaction_id in seen_transaction_ids:
+                    invalid_transactions.append(
+                        {
+                            "row_number": row_number,
+                            "row": row,
+                            "errors": [
+                                {
+                                    "type": "duplicate_transaction",
+                                    "message": (
+                                        "duplicate transaction_id: "
+                                        f"{transaction.transaction_id}"
+                                    ),
+                                }
+                            ],
+                        }
+                    )
+                    continue
+
+                seen_transaction_ids.add(transaction.transaction_id)
                 valid_transactions.append(transaction)
 
             except ValidationError as error:
                 invalid_transactions.append(
                     {
-        "row_number": row_number,
-        "row": row,
-        "errors": error.errors(),
+                        "row_number": row_number,
+                        "row": row,
+                        "errors": error.errors(),
                     }
                 )
 
     return valid_transactions, invalid_transactions
-
-
 
 
 if __name__ == "__main__":

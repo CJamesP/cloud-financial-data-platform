@@ -5,3 +5,5 @@ TXN-10003,2026-08-16,ACC-002,Electric Bill,Utilities,126.42,debit
 TXN-10004,not-a-date,ACC-002,Bad Date Test,Utilities,50.00,debit
 TXN-10005,2026-08-16,ACC-003,Bad Amount Test,Misc,-25.00,debit
 TXN-10006,2026-08-16,ACC-003,Bad Type Test,Misc,25.00,transfer
+TXN-10001,2026-08-17,ACC-004,Duplicate Test,Misc,15.00,debit
+TXN-10007,2026-08-17,   ,Blank Account Test,Misc,10.00,debit
