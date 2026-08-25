@@ -1,0 +1,7 @@
+transaction_id,transaction_date,account_id,description,category,amount,transaction_type
+TXN-10001,2026-08-15,ACC-001,Grocery Store,Groceries,84.37,debit
+TXN-10002,2026-08-15,ACC-001,Payroll,Income,2450.00,credit
+TXN-10003,2026-08-16,ACC-002,Electric Bill,Utilities,126.42,debit
+TXN-10004,not-a-date,ACC-002,Bad Date Test,Utilities,50.00,debit
+TXN-10005,2026-08-16,ACC-003,Bad Amount Test,Misc,-25.00,debit
+TXN-10006,2026-08-16,ACC-003,Bad Type Test,Misc,25.00,transfer
