@@ -2,12 +2,13 @@ from datetime import date
 from decimal import Decimal
 from enum import Enum
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class TransactionType(str, Enum):
     DEBIT = "debit"
     CREDIT = "credit"
+
 
 class Transaction(BaseModel):
     transaction_id: str = Field(min_length=1)
@@ -30,5 +31,11 @@ class Transaction(BaseModel):
 
         if not stripped_value:
             raise ValueError("must not be blank")
-        
+
         return stripped_value
+
+
+class TransactionRead(Transaction):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
