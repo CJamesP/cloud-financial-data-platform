@@ -26,3 +26,12 @@ Thumbs.db
 *.tfstate
 *.tfstate.*
 crash.log
+
+# Terraform-generated Lambda packages
+infrastructure/terraform/*.zip
+
+# Lambda build output
+build/
+
+# Terraform-generated Lambda archives
+infrastructure/terraform/*.zip
