@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+
+
 data "archive_file" "s3_processor" {
   type        = "zip"
   source_dir  = "${path.module}/../../build/lambda/s3_processor"
@@ -29,6 +32,12 @@ resource "aws_iam_role" "lambda_processor" {
 resource "aws_iam_role_policy_attachment" "lambda_logging" {
   role       = aws_iam_role.lambda_processor.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_vpc_access" {
+  role       = aws_iam_role.lambda_processor.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 
@@ -66,6 +75,28 @@ resource "aws_lambda_function" "s3_processor" {
 
   timeout     = 30
   memory_size = 256
+
+  environment {
+    variables = {
+      DATABASE_URL = "postgresql+psycopg://financial_app:${random_password.database.result}@${aws_db_instance.postgres.address}:5432/financial_data"
+    }
+  }
+
+  vpc_config {
+    subnet_ids = [
+      aws_subnet.private_a.id,
+      aws_subnet.private_b.id
+    ]
+
+    security_group_ids = [
+      aws_security_group.lambda.id
+    ]
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logging,
+    aws_iam_role_policy_attachment.lambda_vpc_access
+  ]
 }
 
 
@@ -74,7 +105,9 @@ resource "aws_lambda_permission" "allow_s3" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.s3_processor.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.ingestion.arn
+
+  source_arn     = aws_s3_bucket.ingestion.arn
+  source_account = data.aws_caller_identity.current.account_id
 }
 
 
